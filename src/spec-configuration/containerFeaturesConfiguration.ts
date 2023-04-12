@@ -545,7 +545,7 @@ export async function generateFeaturesConfig(params: ContainerFeatureInternalPar
 	// 	return undefined;
 	// }
 
-	const installationOrder = await computeDependsOnInstallationOrder(params, config); // TODO: We drop the version here.
+	let installationOrder = await computeDependsOnInstallationOrder(params, config); // TODO: We drop the version here.
 	if (!installationOrder) {
 		throw new Error('Failed to resolve Feature dependency tree!');
 	}
@@ -923,7 +923,7 @@ export async function processFeatureIdentifier(params: CommonParams, configPath:
 
 	// (6) Oci Identifier
 	if (type === 'oci' && manifest) {
-		return tryGetOCIFeatureSet(output, userFeature.id, userFeature.options, manifest, originalUserFeatureId);
+		return tryGetOCIFeatureSet(output, userFeature.id, userFeature.options, manifest.manifestObj, originalUserFeatureId);
 	}
 
 	output.write(`Github feature.`);

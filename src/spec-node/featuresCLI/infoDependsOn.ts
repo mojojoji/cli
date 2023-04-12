@@ -5,8 +5,7 @@ import { Log, LogLevel, mapLogLevel } from '../../spec-utils/log';
 import { getPackageConfig } from '../../spec-utils/product';
 import { createLog } from '../devContainers';
 import { UnpackArgv } from '../devContainersSpecCLI';
-import { getRef } from '../../spec-configuration/containerCollectionsOCI';
-import { FNode, buildDependencyGraphFromFeatureRef, computeDependsOnInstallationOrder } from '../../spec-configuration/containerFeaturesOrder';
+import { FNode, buildDependencyGraphFromUserId, computeDependsOnInstallationOrder } from '../../spec-configuration/containerFeaturesOrder';
 import { readLocalFile } from '../../spec-utils/pfs';
 import { DevContainerConfig } from '../../spec-configuration/configuration';
 
@@ -61,12 +60,7 @@ async function featuresInfoDependsOn({
 
 	if (featureId) {
 		output.write(`Building dependency graph for '${featureId}'...`, LogLevel.Info);
-		const featureRef = getRef(output, featureId);
-		if (!featureRef) {
-			output.write(`Provide Feature reference '${featureId}' is invalid.`, LogLevel.Error);
-			process.exit(1);
-		}
-		const graph = await buildDependencyGraphFromFeatureRef(params, featureRef);
+		const graph = await buildDependencyGraphFromUserId(params, featureId);
 		if (!graph) {
 			output.write(`Could not build dependency graph.`, LogLevel.Error);
 			process.exit(1);
@@ -77,8 +71,7 @@ async function featuresInfoDependsOn({
 		}
 
 		// -- Display the graph with my best ascii art skills
-		const rootNode = graph.find(n => n.id === featureRef.resource)!;
-
+		const rootNode = graph[0];
 		output.raw('\n');
 		printGraph(output, rootNode);
 	}
@@ -101,8 +94,8 @@ async function featuresInfoDependsOn({
 
 		output.raw('\n');
 		for (let i = 0; i < installOrder.length; i++) {
-			const { id, options, /*version*/ } = installOrder[i];
-			const str = `${id}\n${options ? JSON.stringify(options) : ''}`;
+			const { canonicalId, options, /*version*/ } = installOrder[i];
+			const str = `${canonicalId}\n${options ? JSON.stringify(options) : ''}`;
 			const box = encloseStringInBox(str);
 			output.raw(`${box}\n`, LogLevel.Info);
 		}
@@ -124,9 +117,9 @@ function encloseStringInBox(str: string, indent: number = 30) {
 }
 
 function printGraph(output: Log, node: FNode, indent = 0) {
-	const { id, dependsOn, options, /*version*/ } = node;
+	const { canonicalId, dependsOn, options, /*version*/ } = node;
 
-	const str = `${id}\n${options ? JSON.stringify(options) : ''}`;
+	const str = `${canonicalId}\n${options ? JSON.stringify(options) : ''}`;
 	output.raw(`${encloseStringInBox(str, indent)}`, LogLevel.Info);
 	output.raw('\n', LogLevel.Info);
 
