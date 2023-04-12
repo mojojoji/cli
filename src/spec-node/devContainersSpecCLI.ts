@@ -36,6 +36,7 @@ import { templateApplyHandler, templateApplyOptions } from './templatesCLI/apply
 import { featuresInfoManifestHandler, featuresInfoManifestOptions } from './featuresCLI/infoManifest';
 import { bailOut, buildNamedImageAndExtend } from './singleContainer';
 import { Event, NodeEventEmitter } from '../spec-utils/event';
+import { featureInfoDependsOnHandler, featuresInfoDependsOnOptions } from './featuresCLI/infoDependsOn';
 
 const defaultDefaultUserEnvProbe: UserEnvProbe = 'loginInteractiveShell';
 
@@ -71,6 +72,7 @@ const mountRegex = /^type=(bind|volume),source=([^,]+),target=([^,]+)(?:,externa
 		y.command('info', 'Fetch metadata on published Features', (y: Argv) => {
 			y.command('tags <feature>', 'Fetch tags for a specific Feature', featuresInfoTagsOptions, featureInfoTagsHandler);
 			y.command('manifest <feature>', 'Fetch the manifest for a specific Feature', featuresInfoManifestOptions, featuresInfoManifestHandler);
+			y.command('depends', 'Resolve the dependencies for a provided Feature or configuration', featuresInfoDependsOnOptions, featureInfoDependsOnHandler);
 		});
 	});
 	y.command('templates', 'Templates commands', (y: Argv) => {

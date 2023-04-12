@@ -7,8 +7,7 @@
 import { FeatureSet, userFeaturesToArray } from '../spec-configuration/containerFeaturesConfiguration';
 import { LogLevel } from '../spec-utils/log';
 import { DevContainerConfig } from './configuration';
-import { OCIRef, getRef } from './containerCollectionsOCI';
-import { CommonParams } from './containerCollectionsOCI';
+import { OCIRef, getRef, CommonParams } from './containerCollectionsOCI';
 import { fetchOCIFeatureManifestIfExistsFromUserIdentifier } from './containerFeaturesOCI';
 
 interface FeatureNode {
