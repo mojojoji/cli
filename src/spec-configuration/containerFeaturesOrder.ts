@@ -54,7 +54,7 @@ interface RootFNode extends FNode {
 export interface FNode {
     id: string;
     // version: string;
-    options?: string | boolean | Record<string, string | boolean | undefined>;
+    options: string | boolean | Record<string, string | boolean | undefined>;
     dependsOn: FNode[];
 }
 
@@ -132,8 +132,9 @@ async function _buildDependencyGraph(params: CommonParams, worklist: FNode[], ac
 
 export async function buildDependencyGraphFromFeatureRef(params: CommonParams, featureRef: OCIRef): Promise<FNode[]> {
 
-    const rootNodes = {
+    const rootNodes: RootFNode = {
         id: featureRef.resource,
+        options: {},
         // version: feature.sourceInformation.userFeatureId.split(':')[1],
         dependsOn: [],
     };
@@ -169,9 +170,10 @@ export async function buildDependencyGraphFromConfig(params: CommonParams, confi
 }
 
 export async function computeDependsOnInstallationOrder(params: CommonParams, config: DevContainerConfig) {
+    const { output } = params;
     const worklist = await buildDependencyGraphFromConfig(params, config);
 
-    params.output.write(`Starting with: ${worklist.map(n => n.id).join(', ')}`, LogLevel.Info);
+    output.write(`Starting with: ${worklist.map(n => n.id).join(', ')}`, LogLevel.Info);
 
     const installationOrder: FNode[] = [];
     while (worklist.length > 0) {
@@ -180,11 +182,12 @@ export async function computeDependsOnInstallationOrder(params: CommonParams, co
             || node.dependsOn.every(dep =>
                 installationOrder.some(installed => fNodeEquality(installed, dep))));
 
-        params.output.write(`Round: ${round.map(r => r.id).join(', ')}`, LogLevel.Info);
+        output.write(`Round: ${round.map(r => r.id).join(', ')}`, LogLevel.Info);
 
         if (round.length === 0) {
-            params.output.write(`Nodes remaining: ${worklist.map(n => n.id).join(', ')}`, LogLevel.Error);
-            throw new Error('Circular dependency detected');
+            output.write('Circular dependency detected!', LogLevel.Error);
+            output.write(`Nodes remaining: ${worklist.map(n => n.id).join(', ')}`, LogLevel.Error);
+            return undefined;
         }
 
         // Delete all nodes present in this round from the worklist.

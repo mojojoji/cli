@@ -14,10 +14,9 @@ export function featuresInfoDependsOnOptions(y: Argv) {
 	return y
 		.options({
 			'log-level': { choices: ['info' as 'info', 'debug' as 'debug', 'trace' as 'trace'], default: 'info' as 'info', description: 'Log level.' },
-			'feature': { type: 'string', description: 'Feature ID.' },
-			'config': { type: 'string', description: 'Path to the configuration file (devcontainer.json) ' },
+			'feature': { alias: 'f', type: 'string', description: 'Feature ID.' },
+			'config': { alias: 'c', type: 'string', description: 'Path to the configuration file (devcontainer.json) ' },
 			'raw': { type: 'boolean', description: 'Output raw data.', default: false },
-			// 'output-format': { choices: ['text' as 'text', 'json' as 'json'], default: 'text', description: 'Output format.' },
 		})
 		.check(argv => {
 			if (argv.feature && argv.config) {
@@ -101,8 +100,8 @@ async function featuresInfoDependsOn({
 		}
 
 		output.raw('\n');
-		for (const node of installOrder) {
-			const { id, options, /*version*/ } = node;
+		for (let i = 0; i < installOrder.length; i++) {
+			const { id, options, /*version*/ } = installOrder[i];
 			const str = `${id}\n${options ? JSON.stringify(options) : ''}`;
 			const box = encloseStringInBox(str);
 			output.raw(`${box}\n`, LogLevel.Info);
