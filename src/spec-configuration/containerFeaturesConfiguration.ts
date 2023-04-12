@@ -545,7 +545,7 @@ export async function generateFeaturesConfig(params: ContainerFeatureInternalPar
 	// 	return undefined;
 	// }
 
-	let installationOrder = await computeDependsOnInstallationOrder(params, config); // TODO: We drop the version here.
+	let installationOrder = await computeDependsOnInstallationOrder(params, config);
 	if (!installationOrder) {
 		throw new Error('Failed to resolve Feature dependency tree!');
 	}
