@@ -60,7 +60,10 @@ export interface OCIManifest {
 		size: number;
 	};
 	layers: OCILayer[];
-	annotations?: {};
+	annotations?: {
+		'dev.containers.experimental.dependsOn'?: string;
+		'com.github.package.type'?: string;
+	};
 }
 
 interface OCITagList {
@@ -133,7 +136,8 @@ export function getRef(output: Log, input: string): OCIRef | undefined {
 	//  2. There is no version :      				   			 eg:   ghcr.io/codspace/features/ruby
 	// In both cases, assume 'latest' tag.
 	if (indexOfLastColon === -1 || indexOfLastColon < input.indexOf('/')) {
-		resource = input;
+		const indexOfLatestTag = input.indexOf(':latest');
+		resource = indexOfLatestTag === -1 ? input : input.substring(0, indexOfLatestTag);
 		version = 'latest';
 	} else {
 		resource = input.substring(0, indexOfLastColon);
