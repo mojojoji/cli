@@ -94,8 +94,9 @@ async function featuresInfoDependsOn({
 
 		output.raw('\n');
 		for (let i = 0; i < installOrder.length; i++) {
-			const { canonicalId, options, /*version*/ } = installOrder[i];
-			const str = `${canonicalId}\n${options ? JSON.stringify(options) : ''}`;
+			const { canonicalId, options, id: userId } = installOrder[i];
+			const split = canonicalId!.split('@');
+			const str = `${split[0]}\n${split[1]}\n${options ? JSON.stringify(options) : ''}\n(Resolved from: '${userId}')`;
 			const box = encloseStringInBox(str);
 			output.raw(`${box}\n`, LogLevel.Info);
 		}
@@ -105,21 +106,23 @@ async function featuresInfoDependsOn({
 	process.exit(0);
 }
 
-function encloseStringInBox(str: string, indent: number = 30) {
+function encloseStringInBox(str: string, indent: number = 0) {
 	const lines = str.split('\n');
+	lines[0] = `\u001b[1m${lines[0]}\u001b[22m`; // Bold
 	const maxWidth = Math.max(...lines.map(l => l.length));
 	const box = [
 		'┌' + '─'.repeat(maxWidth) + '┐',
-		...lines.map(l => '│' + l.padEnd(maxWidth) + '│'),
+		...lines.map(l => '│' + l.padEnd(maxWidth + (l.includes('\u001b[1m') ? 9 : 0)) + '│'),
 		'└' + '─'.repeat(maxWidth) + '┘',
 	];
 	return box.map(t => `${' '.repeat(indent)}${t}`).join('\n');
 }
 
 function printGraph(output: Log, node: FNode, indent = 0) {
-	const { canonicalId, dependsOn, options, /*version*/ } = node;
+	const { canonicalId, dependsOn, options, id: userId } = node;
 
-	const str = `${canonicalId}\n${options ? JSON.stringify(options) : ''}`;
+	const split = canonicalId!.split('@');
+	const str = `${split[0]}\n${split[1]}\n${options ? JSON.stringify(options) : ''}\n(Resolved from: '${userId}')`;
 	output.raw(`${encloseStringInBox(str, indent)}`, LogLevel.Info);
 	output.raw('\n', LogLevel.Info);
 

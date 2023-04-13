@@ -190,7 +190,7 @@ export async function computeDependsOnInstallationOrder(params: CommonParams, co
             || node.dependsOn.every(dep =>
                 installationOrder.some(installed => fNodeEquality(installed, dep))));
 
-        output.write(`Round: ${round.map(r => r.canonicalId!).join(', ')}`, LogLevel.Info);
+        output.write(`Round: ${round.map(r => r.id).join(', ')}`, LogLevel.Info);
 
         if (round.length === 0) {
             output.write('Circular dependency detected!', LogLevel.Error);

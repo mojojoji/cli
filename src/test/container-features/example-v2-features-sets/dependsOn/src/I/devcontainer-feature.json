@@ -1,0 +1,17 @@
+{
+	"name": "FeatureI",
+	"id": "I",
+	"version": "0.0.1",
+	"dependsOn": {
+		"ghcr.io/joshspicer/dependsOnExperiment/E:0.0.11": {
+			"magicNumber": "30"
+		}
+	},
+	"options": {
+		"magicNumber": {
+			"type": "string",
+			"default": "0",
+			"description": "The magic number"
+		}
+	}
+}
